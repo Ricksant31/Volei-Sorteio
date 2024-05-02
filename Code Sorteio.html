@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de Time de Vôlei</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #e0f0ff;
+}
+img{
+  
+}
+</style>
 </head>
 <body>
 
@@ -47,6 +59,10 @@
 <h2>Sortear times:</h2>
 <button onclick="sortearTimes()">Sortear</button>
 
+<!-- Grupos de times (visível para todos) -->
+<div id="gruposTimes">
+</div>
+
 <!-- Script JavaScript -->
 <script>
 // Senha do administrador
@@ -63,6 +79,7 @@ function adicionarJogador() {
   var nome = document.getElementById("nome").value;
   var habilidade = document.getElementById("habilidade").value;
   jogadores.push({nome: nome, habilidade: habilidade});
+  salvarJogadores(); // Salva os jogadores no armazenamento local
   atualizarListaJogadores();
 }
 
@@ -76,6 +93,23 @@ function atualizarListaJogadores() {
     listaJogadores.appendChild(itemLista);
   });
 }
+
+// Função para salvar jogadores no armazenamento local
+function salvarJogadores() {
+  localStorage.setItem('jogadores', JSON.stringify(jogadores));
+}
+
+// Função para carregar jogadores do armazenamento local
+function carregarJogadores() {
+  var jogadoresSalvos = localStorage.getItem('jogadores');
+  if (jogadoresSalvos) {
+    jogadores = JSON.parse(jogadoresSalvos);
+    atualizarListaJogadores();
+  }
+}
+
+// Carregar jogadores ao carregar a página
+carregarJogadores();
 
 // Função para realizar login de administrador
 function login() {
@@ -96,59 +130,71 @@ function editarHabilidade() {
   for (var i = 0; i < jogadores.length; i++) {
     if (jogadores[i].nome === nome) {
       jogadores[i].habilidade = habilidade;
+      salvarJogadores(); // Salva os jogadores atualizados no armazenamento local
       break;
     }
   }
   atualizarListaJogadores();
 }
 
-// Função para sortear times (visível para todos)
-function sortearTimes() {
-  var times = [[], [], []]; // Times vazios
-  var copiaJogadores = jogadores.slice(); // Copia dos jogadores
-  while (copiaJogadores.length > 0) {
-    for (var i = 0; i < times.length && copiaJogadores.length > 0; i++) {
-      var index = Math.floor(Math.random() * copiaJogadores.length);
-      times[i].push(copiaJogadores[index]);
-      copiaJogadores.splice(index, 1);
-    }
-  }
-  // Exibir times
-  for (var i = 0; i < times.length; i++) {
-    console.log("Time " + (i+1) + ":");
-    times[i].forEach(function(jogador) {
-      console.log(jogador.nome + (adminAutenticado ? " (Nível " + jogador.habilidade + ")" : ""));
-    });
-    console.log("\n");
-  }
-}
-// Função para sortear times (visível para todos)
+// Função para sortear times equilibrados (visível para todos)
 function sortearTimes() {
   var times = [[], [], []]; // Times vazios
   var copiaJogadores = jogadores.slice(); // Copia dos jogadores
 
-  // Embaralhe os jogadores aleatoriamente
-  copiaJogadores.sort(function() {
-    return 0.5 - Math.random();
-  });
+  // Separação dos jogadores por nível de habilidade
+  var jogadoresNivel1 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "1"; });
+  var jogadoresNivel2 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "2"; });
+  var jogadoresNivel3 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "3"; });
 
-  // Distribua os jogadores nos times
-  while (copiaJogadores.length > 0) {
-    for (var i = 0; i < times.length && copiaJogadores.length > 0; i++) {
-      times[i].push(copiaJogadores.pop());
+  // Embaralhamento dos jogadores de cada nível
+  jogadoresNivel1.sort(function() { return 0.5 - Math.random(); });
+  jogadoresNivel2.sort(function() { return 0.5 - Math.random(); });
+  jogadoresNivel3.sort(function() { return 0.5 - Math.random(); });
+
+  // Distribuição equilibrada dos jogadores nos times
+  while (jogadoresNivel1.length > 0 || jogadoresNivel2.length > 0 || jogadoresNivel3.length > 0) {
+    for (var i = 0; i < times.length && (jogadoresNivel1.length > 0 || jogadoresNivel2.length > 0 || jogadoresNivel3.length > 0); i++) {
+      if (jogadoresNivel1.length > 0) {
+        times[i].push(jogadoresNivel1.pop());
+      }
+      if (jogadoresNivel1.length > 0) {
+        times[i].push(jogadoresNivel1.pop());
+      }
+      if (jogadoresNivel2.length > 0) {
+        times[i].push(jogadoresNivel2.pop());
+      }
+      if (jogadoresNivel2.length > 0) {
+        times[i].push(jogadoresNivel2.pop());
+      }
+      if (jogadoresNivel3.length > 0) {
+        times[i].push(jogadoresNivel3.pop());
+      }
+      if (jogadoresNivel3.length > 0) {
+        times[i].push(jogadoresNivel3.pop());
+      }
     }
   }
 
-  // Exibir times
+  // Exibir times na página HTML
+  var gruposTimes = document.getElementById("gruposTimes");
+  gruposTimes.innerHTML = ""; // Limpa os grupos anteriores
+
   for (var i = 0; i < times.length; i++) {
-    console.log("Time " + (i+1) + ":");
+    var grupoDiv = document.createElement("div");
+    grupoDiv.innerHTML = "<h2>Time " + (i+1) + ":</h2>";
+    var listaJogadoresDiv = document.createElement("ul");
+
     times[i].forEach(function(jogador) {
-      console.log(jogador.nome + (adminAutenticado ? " (Nível " + jogador.habilidade + ")" : ""));
+      var jogadorItem = document.createElement("li");
+      jogadorItem.textContent = jogador.nome + (adminAutenticado ? " (Nível " + jogador.habilidade + ")" : "");
+      listaJogadoresDiv.appendChild(jogadorItem);
     });
-    console.log("\n");
+
+    grupoDiv.appendChild(listaJogadoresDiv);
+    gruposTimes.appendChild(grupoDiv);
   }
 }
-
 </script>
 
 </body>
