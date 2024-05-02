@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Time de Vôlei</title>
+</head>
+<body>
+
+<h1>Lista de Time de Vôlei</h1>
+
+<!-- Formulário de login para administradores -->
+<h2>Login de Administrador:</h2>
+<input type="password" id="senha" placeholder="Digite a senha">
+<button onclick="login()">Login</button>
+
+<!-- Formulário para adicionar nome ao time (visível para todos) -->
+<h2>Adicionar nome ao time:</h2>
+<input type="text" id="nome" placeholder="Digite o nome">
+<div id="divHabilidade" style="display:none;">
+  <select id="habilidade">
+    <option value="1">Nível 1</option>
+    <option value="2">Nível 2</option>
+    <option value="3">Nível 3</option>
+  </select>
+</div>
+<button onclick="adicionarJogador()">Adicionar</button>
+
+<!-- Lista de jogadores (visível para todos) -->
+<h2>Lista de jogadores:</h2>
+<ul id="listaJogadores">
+</ul>
+
+<!-- Formulário para editar habilidade (visível apenas para administradores) -->
+<div id="formEditarHabilidade" style="display:none;">
+  <h2>Editar habilidade:</h2>
+  <input type="text" id="editarNome" placeholder="Digite o nome">
+  <select id="editarHabilidade">
+    <option value="1">Nível 1</option>
+    <option value="2">Nível 2</option>
+    <option value="3">Nível 3</option>
+  </select>
+  <button onclick="editarHabilidade()">Editar</button>
+</div>
+
+<!-- Botão para sortear times (visível para todos) -->
+<h2>Sortear times:</h2>
+<button onclick="sortearTimes()">Sortear</button>
+
+<!-- Script JavaScript -->
+<script>
+// Senha do administrador
+var senhaAdmin = "admin123";
+
+// Flag para verificar se o administrador está autenticado
+var adminAutenticado = false;
+
+// Array para armazenar os jogadores
+var jogadores = [];
+
+// Função para adicionar jogador (visível para todos)
+function adicionarJogador() {
+  var nome = document.getElementById("nome").value;
+  var habilidade = document.getElementById("habilidade").value;
+  jogadores.push({nome: nome, habilidade: habilidade});
+  atualizarListaJogadores();
+}
+
+// Função para atualizar lista de jogadores na página (visível para todos)
+function atualizarListaJogadores() {
+  var listaJogadores = document.getElementById("listaJogadores");
+  listaJogadores.innerHTML = "";
+  jogadores.forEach(function(jogador) {
+    var itemLista = document.createElement("li");
+    itemLista.textContent = jogador.nome + (adminAutenticado ? " (Nível " + jogador.habilidade + ")" : "");
+    listaJogadores.appendChild(itemLista);
+  });
+}
+
+// Função para realizar login de administrador
+function login() {
+  var senhaDigitada = document.getElementById("senha").value;
+  if (senhaDigitada === senhaAdmin) {
+    adminAutenticado = true;
+    document.getElementById("formEditarHabilidade").style.display = "block"; // Exibir formulário de edição
+    document.getElementById("divHabilidade").style.display = "block"; // Exibir campo de habilidade
+  } else {
+    alert("Senha incorreta. Tente novamente.");
+  }
+}
+
+// Função para editar habilidade (visível apenas para administradores)
+function editarHabilidade() {
+  var nome = document.getElementById("editarNome").value;
+  var habilidade = document.getElementById("editarHabilidade").value;
+  for (var i = 0; i < jogadores.length; i++) {
+    if (jogadores[i].nome === nome) {
+      jogadores[i].habilidade = habilidade;
+      break;
+    }
+  }
+  atualizarListaJogadores();
+}
+
+// Função para sortear times (visível para todos)
+function sortearTimes() {
+  var times = [[], [], []]; // Times vazios
+  var copiaJogadores = jogadores.slice(); // Copia dos jogadores
+  while (copiaJogadores.length > 0) {
+    for (var i = 0; i < times.length && copiaJogadores.length > 0; i++) {
+      var index = Math.floor(Math.random() * copiaJogadores.length);
+      times[i].push(copiaJogadores[index]);
+      copiaJogadores.splice(index, 1);
+    }
+  }
+  // Exibir times
+  for (var i = 0; i < times.length; i++) {
+    console.log("Time " + (i+1) + ":");
+    times[i].forEach(function(jogador) {
+      console.log(jogador.nome + (adminAutenticado ? " (Nível " + jogador.habilidade + ")" : ""));
+    });
+    console.log("\n");
+  }
+}
+// Função para sortear times (visível para todos)
+function sortearTimes() {
+  var times = [[], [], []]; // Times vazios
+  var copiaJogadores = jogadores.slice(); // Copia dos jogadores
+
+  // Embaralhe os jogadores aleatoriamente
+  copiaJogadores.sort(function() {
+    return 0.5 - Math.random();
+  });
+
+  // Distribua os jogadores nos times
+  while (copiaJogadores.length > 0) {
+    for (var i = 0; i < times.length && copiaJogadores.length > 0; i++) {
+      times[i].push(copiaJogadores.pop());
+    }
+  }
+
+  // Exibir times
+  for (var i = 0; i < times.length; i++) {
+    console.log("Time " + (i+1) + ":");
+    times[i].forEach(function(jogador) {
+      console.log(jogador.nome + (adminAutenticado ? " (Nível " + jogador.habilidade + ")" : ""));
+    });
+    console.log("\n");
+  }
+}
+
+</script>
+
+</body>
+</html>
