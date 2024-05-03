@@ -4,27 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de Time de Vôlei</title>
+<link rel="stylesheet" href="styles.css">
 <style>
 body {
   font-family: Arial, sans-serif;
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #e0f0ff;
+  background-image: url('fundo volei novo.jpg'); /* Substitua pelo caminho da sua imagem */
+  background-size: cover;
 }
-img{
-  
-}
+
 </style>
 </head>
 <body>
+<img src="logo volei.png" alt="Logo" class="logo">
+  
+<div class="header">
+    
+  <h1>Lista de Time de Vôlei</h1>
 
-<h1>Lista de Time de Vôlei</h1>
-
+</div>
 <!-- Formulário de login para administradores -->
-<h2>Login de Administrador:</h2>
-<input type="password" id="senha" placeholder="Digite a senha">
-<button onclick="login()">Login</button>
+<center>
+  <h2>Login de Administrador:</h2>
+  <input type="password" id="senha" placeholder="Digite a senha">
+  <button onclick="login()">Login</button>
 
 <!-- Formulário para adicionar nome ao time (visível para todos) -->
 <h2>Adicionar nome ao time:</h2>
@@ -55,6 +60,19 @@ img{
   <button onclick="editarHabilidade()">Editar</button>
 </div>
 
+<!-- Botão para limpar todos os nomes (visível apenas para administradores) -->
+<div id="formLimparJogadores" style="display:none;">
+  <h2>Limpar todos os nomes:</h2>
+  <button onclick="limparTodosJogadores()">Limpar</button>
+</div>
+
+<!-- Botão para remover um nome (visível apenas para administradores) -->
+<div id="formRemoverJogador" style="display:none;">
+  <h2>Remover um nome:</h2>
+  <input type="text" id="removerNome" placeholder="Digite o nome">
+  <button onclick="removerJogador()">Remover</button>
+</div>
+
 <!-- Botão para sortear times (visível para todos) -->
 <h2>Sortear times:</h2>
 <button onclick="sortearTimes()">Sortear</button>
@@ -81,6 +99,7 @@ function adicionarJogador() {
   jogadores.push({nome: nome, habilidade: habilidade});
   salvarJogadores(); // Salva os jogadores no armazenamento local
   atualizarListaJogadores();
+  document.getElementById("nome").value = ''; // Limpa o campo de entrada após adicionar o jogador
 }
 
 // Função para atualizar lista de jogadores na página (visível para todos)
@@ -117,6 +136,8 @@ function login() {
   if (senhaDigitada === senhaAdmin) {
     adminAutenticado = true;
     document.getElementById("formEditarHabilidade").style.display = "block"; // Exibir formulário de edição
+    document.getElementById("formLimparJogadores").style.display = "block"; // Exibir botão para limpar todos os nomes
+    document.getElementById("formRemoverJogador").style.display = "block"; // Exibir formulário para remover um nome
     document.getElementById("divHabilidade").style.display = "block"; // Exibir campo de habilidade
   } else {
     alert("Senha incorreta. Tente novamente.");
@@ -137,65 +158,23 @@ function editarHabilidade() {
   atualizarListaJogadores();
 }
 
-// Função para sortear times equilibrados (visível para todos)
-function sortearTimes() {
-  var times = [[], [], []]; // Times vazios
-  var copiaJogadores = jogadores.slice(); // Copia dos jogadores
+// Função para limpar todos os nomes (visível apenas para administradores)
+function limparTodosJogadores() {
+  jogadores = []; // Limpa a lista de jogadores
+  salvarJogadores(); // Salva a lista vazia no armazenamento local
+  atualizarListaJogadores(); // Atualiza a lista de jogadores na página
+}
 
-  // Separação dos jogadores por nível de habilidade
-  var jogadoresNivel1 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "1"; });
-  var jogadoresNivel2 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "2"; });
-  var jogadoresNivel3 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "3"; });
-
-  // Embaralhamento dos jogadores de cada nível
-  jogadoresNivel1.sort(function() { return 0.5 - Math.random(); });
-  jogadoresNivel2.sort(function() { return 0.5 - Math.random(); });
-  jogadoresNivel3.sort(function() { return 0.5 - Math.random(); });
-
-  // Distribuição equilibrada dos jogadores nos times
-  while (jogadoresNivel1.length > 0 || jogadoresNivel2.length > 0 || jogadoresNivel3.length > 0) {
-    for (var i = 0; i < times.length && (jogadoresNivel1.length > 0 || jogadoresNivel2.length > 0 || jogadoresNivel3.length > 0); i++) {
-      if (jogadoresNivel1.length > 0) {
-        times[i].push(jogadoresNivel1.pop());
-      }
-      if (jogadoresNivel1.length > 0) {
-        times[i].push(jogadoresNivel1.pop());
-      }
-      if (jogadoresNivel2.length > 0) {
-        times[i].push(jogadoresNivel2.pop());
-      }
-      if (jogadoresNivel2.length > 0) {
-        times[i].push(jogadoresNivel2.pop());
-      }
-      if (jogadoresNivel3.length > 0) {
-        times[i].push(jogadoresNivel3.pop());
-      }
-      if (jogadoresNivel3.length > 0) {
-        times[i].push(jogadoresNivel3.pop());
-      }
-    }
-  }
-
-  // Exibir times na página HTML
-  var gruposTimes = document.getElementById("gruposTimes");
-  gruposTimes.innerHTML = ""; // Limpa os grupos anteriores
-
-  for (var i = 0; i < times.length; i++) {
-    var grupoDiv = document.createElement("div");
-    grupoDiv.innerHTML = "<h2>Time " + (i+1) + ":</h2>";
-    var listaJogadoresDiv = document.createElement("ul");
-
-    times[i].forEach(function(jogador) {
-      var jogadorItem = document.createElement("li");
-      jogadorItem.textContent = jogador.nome + (adminAutenticado ? " (Nível " + jogador.habilidade + ")" : "");
-      listaJogadoresDiv.appendChild(jogadorItem);
-    });
-
-    grupoDiv.appendChild(listaJogadoresDiv);
-    gruposTimes.appendChild(grupoDiv);
-  }
+// Função para remover um nome (visível apenas para administradores)
+function removerJogador() {
+  var nome = document.getElementById("removerNome").value;
+  jogadores = jogadores.filter(function(jogador) {
+    return jogador.nome !== nome; // Remove o jogador com o nome especificado
+  });
+  salvarJogadores(); // Salva a lista atualizada no armazenamento local
+  atualizarListaJogadores(); // Atualiza a lista de jogadores na página
 }
 </script>
-
+</center>
 </body>
 </html>

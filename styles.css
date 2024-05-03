@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-image: url('fundo\ volei\ novo.jpg'); /* Substitua pelo caminho da sua imagem de fundo */
+    background-size: cover; /* Ajusta a imagem ao tamanho da tela sem distorcer */
+
+  }
+  
+  .header {
+    text-align: center;
+    position: relative;
+  }
+  
+  .logo {
+    width: 100px; /* Defina o tamanho da sua logo */
+    height: 100px;
+    border-radius: 50%; /* Faz a logo ter formato redondo */
+    position: absolute;
+    top: 20px; /* Ajusta a posição vertical da logo */
+    left: calc(50% - 50px); /* Centraliza horizontalmente */
+    z-index: 1; /* Garante que a logo fique sobreposta ao título */
+  }
+  
+  
+  h1 {
+    margin-top: 100px; /* Ajusta a margem superior do título */
+  }
+  
