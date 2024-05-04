@@ -174,6 +174,89 @@ function removerJogador() {
   salvarJogadores(); // Salva a lista atualizada no armazenamento local
   atualizarListaJogadores(); // Atualiza a lista de jogadores na página
 }
+
+function sortearTimes() {
+  var times = [[], [], []]; // Times vazios
+  var copiaJogadores = jogadores.slice(); // Copia dos jogadores
+
+  // Separação dos jogadores por nível de habilidade
+  var jogadoresNivel1 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "1"; });
+  var jogadoresNivel2 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "2"; });
+  var jogadoresNivel3 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "3"; });
+
+  // Embaralhamento dos jogadores de cada nível
+  shuffleArray(jogadoresNivel1);
+  shuffleArray(jogadoresNivel2);
+  shuffleArray(jogadoresNivel3);
+
+  // Distribuir jogadores nos times
+  for (var i = 0; i < times.length; i++) {
+    times[i].push(jogadoresNivel1.pop());
+    times[i].push(jogadoresNivel1.pop());
+    times[i].push(jogadoresNivel2.pop());
+    times[i].push(jogadoresNivel2.pop());
+    times[i].push(jogadoresNivel3.pop());
+    times[i].push(jogadoresNivel3.pop());
+  }
+
+  // Exibir os times
+  exibirTimes(times);
+}
+
+// Função para embaralhar um array
+function shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
+
+// Função para sortear os times e exibi-los na página HTML
+function sortearTimes() {
+  var jogadoresCopia = jogadores.slice(); // Copia dos jogadores
+  var gruposTimes = [];
+  
+  // Embaralhamento dos jogadores
+  shuffleArray(jogadoresCopia);
+  
+  // Dividir os jogadores em grupos de 6
+  while (jogadoresCopia.length > 0) {
+    gruposTimes.push(jogadoresCopia.splice(0, 6));
+  }
+  
+  // Exibir os times na página HTML
+  exibirTimes(gruposTimes);
+}
+
+// Função para exibir os times na página HTML
+function exibirTimes(gruposTimes) {
+  var gruposTimesContainer = document.getElementById("gruposTimes");
+  gruposTimesContainer.innerHTML = ""; // Limpa qualquer conteúdo existente
+
+  gruposTimes.forEach(function(grupo, index) {
+    var grupoDiv = document.createElement("div");
+    grupoDiv.classList.add("grupo");
+    
+    var tituloGrupo = document.createElement("h3");
+    tituloGrupo.textContent = "Time " + (index + 1) + ":";
+    grupoDiv.appendChild(tituloGrupo);
+    
+    grupo.forEach(function(jogador) {
+      var jogadorParagrafo = document.createElement("p");
+      jogadorParagrafo.textContent = jogador.nome;
+      grupoDiv.appendChild(jogadorParagrafo);
+    });
+
+    gruposTimesContainer.appendChild(grupoDiv);
+  });
+}
+
+
+
+
 </script>
 </center>
 </body>
