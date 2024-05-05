@@ -175,30 +175,34 @@ function removerJogador() {
   atualizarListaJogadores(); // Atualiza a lista de jogadores na página
 }
 
+// Função para sortear os times e exibi-los na página HTML
 function sortearTimes() {
-  var times = [[], [], []]; // Times vazios
+  var times = []; // Array para armazenar os times
   var copiaJogadores = jogadores.slice(); // Copia dos jogadores
-
+  
   // Separação dos jogadores por nível de habilidade
   var jogadoresNivel1 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "1"; });
   var jogadoresNivel2 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "2"; });
   var jogadoresNivel3 = copiaJogadores.filter(function(jogador) { return jogador.habilidade === "3"; });
-
+  
   // Embaralhamento dos jogadores de cada nível
   shuffleArray(jogadoresNivel1);
   shuffleArray(jogadoresNivel2);
   shuffleArray(jogadoresNivel3);
-
-  // Distribuir jogadores nos times
-  for (var i = 0; i < times.length; i++) {
-    times[i].push(jogadoresNivel1.pop());
-    times[i].push(jogadoresNivel1.pop());
-    times[i].push(jogadoresNivel2.pop());
-    times[i].push(jogadoresNivel2.pop());
-    times[i].push(jogadoresNivel3.pop());
-    times[i].push(jogadoresNivel3.pop());
+  
+  // Verifica se há jogadores suficientes de cada nível para formar times
+  if (jogadoresNivel1.length < 2 || jogadoresNivel2.length < 2 || jogadoresNivel3.length < 2) {
+    alert("Não há jogadores suficientes para formar times com duas pessoas de cada nível de habilidade.");
+    return; // Encerra a função se não houver jogadores suficientes
   }
-
+  
+  // Distribuir jogadores nos times
+  while (jogadoresNivel1.length >= 2 && jogadoresNivel2.length >= 2 && jogadoresNivel3.length >= 2) {
+    var time = [];
+    time.push(jogadoresNivel1.pop(), jogadoresNivel1.pop(), jogadoresNivel2.pop(), jogadoresNivel2.pop(), jogadoresNivel3.pop(), jogadoresNivel3.pop());
+    times.push(time);
+  }
+  
   // Exibir os times
   exibirTimes(times);
 }
@@ -211,24 +215,6 @@ function shuffleArray(array) {
     array[i] = array[j];
     array[j] = temp;
   }
-}
-
-
-// Função para sortear os times e exibi-los na página HTML
-function sortearTimes() {
-  var jogadoresCopia = jogadores.slice(); // Copia dos jogadores
-  var gruposTimes = [];
-  
-  // Embaralhamento dos jogadores
-  shuffleArray(jogadoresCopia);
-  
-  // Dividir os jogadores em grupos de 6
-  while (jogadoresCopia.length > 0) {
-    gruposTimes.push(jogadoresCopia.splice(0, 6));
-  }
-  
-  // Exibir os times na página HTML
-  exibirTimes(gruposTimes);
 }
 
 // Função para exibir os times na página HTML
@@ -253,10 +239,6 @@ function exibirTimes(gruposTimes) {
     gruposTimesContainer.appendChild(grupoDiv);
   });
 }
-
-
-
-
 </script>
 </center>
 </body>
